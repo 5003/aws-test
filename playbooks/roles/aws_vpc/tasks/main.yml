@@ -1,0 +1,15 @@
+---
+- name: gets list of availability zones available in current region
+  local_action: >
+                 shell aws ec2 describe-availability-zones --region $AWS_REGION
+                 | jq --raw-output '.AvailabilityZones | map(.ZoneName) | .[]'
+  register: ec2_describe_availability_zones
+- debug: var=ec2_describe_availability_zones.stdout_lines
+- name: creation of vpc, subnet, rtb, and igw
+  local_action: >
+                 ec2_vpc state=present
+                 cidr_block={{ aws_vpc.cidr_block }} resource_tags={{ aws_vpc.resource_tags }}
+                 subnets={{ aws_vpc.subnets }} internet_gateway=yes
+                 route_tables={{ aws_vpc.route_tables }}
+  register: reg_aws_vpc
+- debug: var=reg_aws_vpc

@@ -1,0 +1,61 @@
+---
+aws_vpc:
+  cidr_block: 172.31.0.0/16
+  resource_tags:
+    Name: app
+  subnets:
+    - cidr: 172.31.10.0/24
+      az: "{{ ec2_describe_availability_zones.stdout_lines.0 }}"
+      resource_tags:
+        Name: frontend
+        Network: public
+    - cidr: 172.31.20.0/24
+      az: "{{ ec2_describe_availability_zones.stdout_lines.1 }}"
+      resource_tags:
+        Name: frontend
+        Network: public
+    - cidr: 172.31.110.0/24
+      az: "{{ ec2_describe_availability_zones.stdout_lines.0 }}"
+      resource_tags:
+        Name: backend
+        Network: public
+    - cidr: 172.31.120.0/24
+      az: "{{ ec2_describe_availability_zones.stdout_lines.1 }}"
+      resource_tags:
+        Name: backend
+        Network: public
+    - cidr: 172.31.210.0/24
+      az: "{{ ec2_describe_availability_zones.stdout_lines.0 }}"
+      resource_tags:
+        Name: datastore
+        Network: private
+    - cidr: 172.31.220.0/24
+      az: "{{ ec2_describe_availability_zones.stdout_lines.1 }}"
+      resource_tags:
+        Name: datastore
+        Network: private
+  route_tables:
+    - subnets:
+      - 172.31.10.0/24
+      - 172.31.20.0/24
+      routes:
+      - dest: 0.0.0.0/0
+        gw: igw
+      resource_tags:
+        Name: frontend
+    - subnets:
+      - 172.31.110.0/24
+      - 172.31.120.0/24
+      routes:
+      - dest: 0.0.0.0/0
+        gw: igw
+      resource_tags:
+        Name: backend
+    - subnets:
+      - 172.31.210.0/24
+      - 172.31.220.0/24
+      routes:
+      - dest: 0.0.0.0/0
+        gw: igw
+      resource_tags:
+        Name: datastore
